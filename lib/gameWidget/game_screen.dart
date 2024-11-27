@@ -306,12 +306,18 @@ class _MemoryGameState extends State<MemoryGame>
         );
       },
       child: isFlipped
-          ? Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-              key: ValueKey(imagePath),
+          ? Container(
+              width: double.infinity,
+              height: double.infinity, 
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                key: ValueKey(imagePath),
+              ),
             )
           : Container(
+              width: double.infinity,
+              height: double.infinity,
               key: const ValueKey('question'),
               child: Image.asset(
                 questionMark,
@@ -406,13 +412,18 @@ class _MemoryGameState extends State<MemoryGame>
             ),
             Padding(
               padding: EdgeInsets.only(
-                  top: checkCards ? 300 : 245, right: 16, left: 16),
+                top: (MediaQuery.of(context).size.width > 800 ? 315 : 260),
+                right: (MediaQuery.of(context).size.width > 800 ? 150 : 16),
+                left: (MediaQuery.of(context).size.width > 800 ? 150 : 16),
+                bottom: 0,
+              ),
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8),
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 2, 
+                  mainAxisSpacing: 2, 
+                ),
                 itemCount: gameGrid.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(

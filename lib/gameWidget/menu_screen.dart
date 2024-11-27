@@ -21,12 +21,12 @@ class _MenuScreenState extends State<MenuScreen> {
   ];
 
   final List<Offset> _positions = [
-    Offset(140, 60),
-    Offset(270, 140),
-    Offset(20, 216), 
-    Offset(175, 620), 
-    Offset(15, 690),
-    Offset(270, 760), 
+    Offset(0.4, 0.1), 
+    Offset(0.65, 0.2),
+    Offset(0.05, 0.23),
+    Offset(0.41, 0.66), 
+    Offset(0.04, 0.76), 
+    Offset(0.65, 0.75), 
   ];
 
   final List<bool> _visibilityStates = List<bool>.filled(6, false);
@@ -54,14 +54,24 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
 
-  Widget textTitle(){
-    return  Positioned(top: 420, right:0, left:0, child: Center(child: Text("Treasure Map Memory", style: GoogleFonts.spicyRice(color: Colors.white, fontSize: 38, fontWeight: FontWeight.bold)),));
+  Widget textTitle() {
+    return Positioned(
+        top: 420,
+        right: 0,
+        left: 0,
+        child: Center(
+          child: Text("Treasure Map Memory",
+              style: GoogleFonts.spicyRice(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.bold)),
+        ));
   }
 
   Widget playButton() {
     return GestureDetector(
       onTap: () {
-         Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => const MemoryGame(),
@@ -80,8 +90,20 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  List<Offset> _calculatePositions(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    return _positions.map((relativeOffset) {
+      return Offset(
+        screenSize.width * relativeOffset.dx,
+        screenSize.height * relativeOffset.dy,
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final dynamicPositions = _calculatePositions(context);
+
     return Scaffold(
         body: Container(
       decoration: const BoxDecoration(
@@ -101,8 +123,8 @@ class _MenuScreenState extends State<MenuScreen> {
           // Image Stack
           ...List.generate(images.length, (index) {
             return Positioned(
-              top: _positions[index].dy,
-              left: _positions[index].dx,
+              top: dynamicPositions[index].dy,
+              left: dynamicPositions[index].dx,
               child: AnimatedOpacity(
                 duration: const Duration(seconds: 1),
                 opacity: _visibilityStates[index] ? 1.0 : 0.0,
