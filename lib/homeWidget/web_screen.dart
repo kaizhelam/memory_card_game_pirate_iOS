@@ -1,10 +1,12 @@
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WebViewScreen extends StatefulWidget {
-  const WebViewScreen({super.key, required this.backgroundColor, required this.url});
+  const WebViewScreen(
+      {super.key, required this.backgroundColor, required this.url});
 
   final Color backgroundColor;
   final String url;
@@ -38,7 +40,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     setState(() {
       left = savedLeft ?? 0.0;
-      top = savedTop ?? (MediaQuery.of(context).size.height - bottomBarHeight - 50) / 2;
+      top = savedTop ??
+          (MediaQuery.of(context).size.height - bottomBarHeight - 50) / 2;
     });
   }
 
@@ -53,7 +56,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
       _selectedIndex = index;
       if (index == 0) {
         if (_latestUrl != null) {
-          _webViewController.loadUrl(urlRequest: URLRequest(url: WebUri(_latestUrl!)));
+          _webViewController.loadUrl(
+              urlRequest: URLRequest(url: WebUri(_latestUrl!)));
         }
       } else if (index == 1) {
         _webViewController.goBack();
@@ -79,7 +83,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            double maxTopPosition = constraints.maxHeight - bottomBarHeight - 100;
+            double maxTopPosition =
+                constraints.maxHeight - bottomBarHeight - 100;
             double maxLeftPosition = constraints.maxWidth - 50;
             if (left < 0) left = 0;
             if (top < 0) top = 0;
@@ -98,26 +103,24 @@ class _WebViewScreenState extends State<WebViewScreen> {
                     onLoadStop: (controller, url) {
                       setState(() {
                         _isLoading = false;
-                        _latestUrl = url?.toString();
+                        _latestUrl ??= url?.toString();
                       });
                     },
                     onLoadStart: (controller, url) {
                       setState(() {
                         _isLoading = true;
-                        _latestUrl ??= url?.toString();
                       });
                     },
                     onWebViewCreated: (controller) {
                       _webViewController = controller;
                     },
-                    onLoadError: (controller, url, code, message) {
-                      print("Error loading page: $message");
+                    onReceivedError: (controller, request, error) {
+                      log("Error loading page: ${error.description}");
                     },
-                    androidOnPermissionRequest: (controller, origin, resources) async {
-                      return PermissionRequestResponse(
-                        resources: resources,
-                        action: PermissionRequestResponseAction.GRANT,
-                      );
+                    onPermissionRequest: (controller, permissionRequest) async {
+                      return PermissionResponse(
+                          resources: permissionRequest.resources,
+                          action: PermissionResponseAction.GRANT);
                     },
                   ),
                 ),
@@ -165,13 +168,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
                   ),
                 ),
                 AnimatedPositioned(
-                  duration: const Duration(milliseconds: 00), 
-                  bottom: _isBottomBarVisible ? 0 : -bottomBarHeight, 
+                  duration: const Duration(milliseconds: 00),
+                  bottom: _isBottomBarVisible ? 0 : -bottomBarHeight,
                   left: 0,
                   right: 0,
                   child: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom),
                       child: BottomNavigationBar(
                         type: BottomNavigationBarType.fixed,
                         backgroundColor: Colors.black,
@@ -181,11 +185,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
                             label: '',
                           ),
                           BottomNavigationBarItem(
-                            icon: Center(child: Icon(Icons.arrow_back, size: 24)),
+                            icon:
+                                Center(child: Icon(Icons.arrow_back, size: 24)),
                             label: '',
                           ),
                           BottomNavigationBarItem(
-                            icon: Center(child: Icon(Icons.arrow_forward, size: 24)),
+                            icon: Center(
+                                child: Icon(Icons.arrow_forward, size: 24)),
                             label: '',
                           ),
                           BottomNavigationBarItem(
