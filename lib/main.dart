@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://6703907dab8a8f892730a6d2.mockapi.io/api/v1/elementalmatch'),
+            'https://6703907dab8a8f892730a6d2.mockapi.io/api/v1/memorycardgame'),
       );
 
       if (response.statusCode == 200) {
@@ -40,6 +41,8 @@ class _MyAppState extends State<MyApp> {
         if (data.isNotEmpty) {
           final bool isOn = data[0]['is_on'] ?? false;
           final String urlLink = data[0]['url'] ?? '';
+
+          log("isOn : $isOn");
 
           if (isOn && await isValidUrl(urlLink)) {
             url = urlLink;
@@ -79,12 +82,24 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: (url == null || url!.isEmpty)
-          ? const MenuScreen()
-          : WebViewScreen(
-              backgroundColor: Colors.black,
-              url: url!,
-            ),
+      home: url == null
+          ? Center(
+              child: Container(
+                width: 150,
+                height: 150,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Image.asset("assets/images/logo.png"),
+              ),
+            )
+          : url!.isEmpty
+              ? const MenuScreen()
+              : WebViewScreen(
+                  backgroundColor: Colors.black,
+                  url: url!,
+                ),
     );
   }
 }
