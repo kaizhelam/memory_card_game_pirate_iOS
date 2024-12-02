@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:memory_card_game/homeWidget/web_screen.dart';
 import 'package:memory_card_game/gameWidget/menu_screen.dart';
@@ -21,13 +23,25 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String? url;
+
   @override
   void initState() {
     super.initState();
+
+    // Lock orientation to portrait when this screen is displayed
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
     fetchIsOn();
   }
 
-  String? url;
+  @override
+  void dispose() {
+    // Unlock orientation when leaving this screen
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   Future<void> fetchIsOn() async {
     try {
@@ -80,26 +94,37 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: url == null
-          ? Center(
-              child: Container(
-                width: 150,
-                height: 150,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+    return ScreenUtilInit(
+      designSize: const Size(430, 932),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),
+          child: child!,
+        );
+      },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: url == null
+            ? Center(
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Image.asset("assets/images/logo.png"),
                 ),
-                child: Image.asset("assets/images/logo.png"),
-              ),
-            )
-          : url!.isEmpty
-              ? const MenuScreen()
-              : WebViewScreen(
-                  backgroundColor: Colors.black,
-                  url: url!,
-                ),
+              )
+            : url!.isEmpty
+                ? const MenuScreen()
+                : WebViewScreen(
+                    backgroundColor: Colors.black,
+                    url: url!,
+                  ),
+      ),
     );
   }
 }

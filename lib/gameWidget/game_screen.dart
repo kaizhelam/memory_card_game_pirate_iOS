@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MemoryGame extends StatefulWidget {
@@ -98,6 +99,8 @@ class _MemoryGameState extends State<MemoryGame>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+
       setState(() {
         if (remainingTime > 0) {
           remainingTime--;
@@ -161,11 +164,11 @@ class _MemoryGameState extends State<MemoryGame>
       builder: (context) => AlertDialog(
         title: Text(
           title,
-          style: GoogleFonts.spicyRice(fontSize: 38),
+          style: GoogleFonts.spicyRice(fontSize: 38.sp),
         ),
         content: Text(
           message,
-          style: GoogleFonts.spicyRice(fontSize: 20),
+          style: GoogleFonts.spicyRice(fontSize: 20.sp),
         ),
         actions: [
           ElevatedButton(
@@ -184,7 +187,7 @@ class _MemoryGameState extends State<MemoryGame>
             child: Text(
               "Quit",
               style: GoogleFonts.spicyRice(
-                fontSize: 24,
+                fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -203,7 +206,7 @@ class _MemoryGameState extends State<MemoryGame>
                 foregroundColor: Colors.white,
                 backgroundColor: const Color(0xFF0D47A1),
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24).r,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -211,7 +214,7 @@ class _MemoryGameState extends State<MemoryGame>
               child: Text(
                 "Next Level",
                 style: GoogleFonts.spicyRice(
-                  fontSize: 24,
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -230,7 +233,7 @@ class _MemoryGameState extends State<MemoryGame>
                 foregroundColor: Colors.white,
                 backgroundColor: const Color(0xFF0D47A1),
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24).r,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -238,7 +241,7 @@ class _MemoryGameState extends State<MemoryGame>
               child: Text(
                 "Restart",
                 style: GoogleFonts.spicyRice(
-                  fontSize: 24,
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -306,23 +309,14 @@ class _MemoryGameState extends State<MemoryGame>
         );
       },
       child: isFlipped
-          ? Container(
-              width: double.infinity,
-              height: double.infinity, 
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                key: ValueKey(imagePath),
-              ),
+          ? Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              key: ValueKey(imagePath),
             )
-          : Container(
-              width: double.infinity,
-              height: double.infinity,
-              key: const ValueKey('question'),
-              child: Image.asset(
-                questionMark,
-                fit: BoxFit.cover,
-              ),
+          : Image.asset(
+              questionMark,
+              fit: BoxFit.cover,
             ),
     );
   }
@@ -345,8 +339,8 @@ class _MemoryGameState extends State<MemoryGame>
         ),
         child: Stack(
           children: [
-            Align(
-              alignment: Alignment.center,
+            // Confetti
+            Center(
               child: ConfettiWidget(
                 confettiController: _confettiController,
                 blastDirectionality: BlastDirectionality.explosive,
@@ -359,87 +353,94 @@ class _MemoryGameState extends State<MemoryGame>
                 ],
               ),
             ),
-            Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 80, right: 30, left: 30),
-                  child: Column(
+
+            // content
+            Positioned.fill(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // title
+                  Text(
+                    "Memory Card Game",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.spicyRice(
+                      fontSize: 42.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+
+                  // description
+                  Text(
+                    "Match the cards to win!",
+                    style: GoogleFonts.spicyRice(
+                      fontSize: 26.sp,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+
+                  // Level
+                  Text(
+                    "Level $currentLevel",
+                    style: GoogleFonts.spicyRice(
+                      fontSize: 26.sp,
+                      color: Colors.white70,
+                    ),
+                  ),
+
+                  // move, time
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text("Memory Card Game",
-                          style: GoogleFonts.spicyRice(
-                            fontSize: 42,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          )),
-                      const SizedBox(height: 5),
                       Text(
-                        "Match the cards to win!",
+                        "Moves: $moves",
                         style: GoogleFonts.spicyRice(
-                          fontSize: 26,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 5,
+                            color: Colors.white, fontSize: 33.sp),
                       ),
                       Text(
-                        "Level $currentLevel",
+                        "Time: $remainingTime s",
                         style: GoogleFonts.spicyRice(
-                          fontSize: 26,
-                          color: Colors.white70,
-                        ),
+                            color: Colors.white, fontSize: 33.sp),
                       ),
                     ],
                   ),
-                )),
-            Padding(
-              padding: const EdgeInsets.only(top: 240, right: 24, left: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Moves: $moves",
-                    style: GoogleFonts.spicyRice(
-                        color: Colors.white, fontSize: 33),
-                  ),
-                  Text(
-                    "Time: $remainingTime s",
-                    style: GoogleFonts.spicyRice(
-                        color: Colors.white, fontSize: 33),
+                  SizedBox(height: 15.h),
+
+                  // boxes
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 1.sh * 0.05).r,
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(0).r,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 2,
+                        mainAxisSpacing: 2,
+                      ),
+                      itemCount: gameGrid.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () => _onCardTapped(index),
+                          child: buildCard(
+                            gameGrid[index],
+                            cardFlipped[index],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                top: (MediaQuery.of(context).size.width > 800 ? 315 : 260),
-                right: (MediaQuery.of(context).size.width > 800 ? 150 : 16),
-                left: (MediaQuery.of(context).size.width > 800 ? 150 : 16),
-                bottom: 0,
-              ),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 2, 
-                  mainAxisSpacing: 2, 
-                ),
-                itemCount: gameGrid.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => _onCardTapped(index),
-                    child: buildCard(
-                      gameGrid[index],
-                      cardFlipped[index],
-                    ),
-                  );
-                },
-              ),
-            ),
+
             if (showCongratsMessage)
               IgnorePointer(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 35),
+                  padding: const EdgeInsets.only(bottom: 30).r,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: SlideTransition(
@@ -455,7 +456,7 @@ class _MemoryGameState extends State<MemoryGame>
                         child: Text(
                           message,
                           style: GoogleFonts.spicyRice(
-                            fontSize: 30,
+                            fontSize: 25.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -465,6 +466,28 @@ class _MemoryGameState extends State<MemoryGame>
                   ),
                 ),
               ),
+
+            // back button
+            Positioned(
+              left: kToolbarHeight / 2.5,
+              top: kToolbarHeight * 1.2,
+              right: 0,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: kToolbarHeight * 0.8,
+                    height: kToolbarHeight * 0.8,
+                    decoration: const BoxDecoration(
+                        color: Colors.white, shape: BoxShape.circle),
+                    child: const Icon(Icons.keyboard_arrow_left),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

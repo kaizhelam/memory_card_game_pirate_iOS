@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:memory_card_game/gameWidget/game_screen.dart';
 
@@ -21,12 +22,12 @@ class _MenuScreenState extends State<MenuScreen> {
   ];
 
   final List<Offset> _positions = [
-    Offset(0.4, 0.1), 
-    Offset(0.65, 0.2),
-    Offset(0.05, 0.23),
-    Offset(0.41, 0.66), 
-    Offset(0.04, 0.76), 
-    Offset(0.65, 0.75), 
+    const Offset(0.4, 0.1),
+    const Offset(0.65, 0.2),
+    const Offset(0.05, 0.23),
+    const Offset(0.41, 0.66),
+    const Offset(0.04, 0.76),
+    const Offset(0.65, 0.75),
   ];
 
   final List<bool> _visibilityStates = List<bool>.filled(6, false);
@@ -55,17 +56,12 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Widget textTitle() {
-    return Positioned(
-        top: 420,
-        right: 0,
-        left: 0,
-        child: Center(
-          child: Text("Treasure Map Memory",
-              style: GoogleFonts.spicyRice(
-                  color: Colors.white,
-                  fontSize: 38,
-                  fontWeight: FontWeight.bold)),
-        ));
+    return Text(
+      "Treasure Map Memory",
+      textAlign: TextAlign.center,
+      style: GoogleFonts.spicyRice(
+          color: Colors.white, fontSize: 38.sp, fontWeight: FontWeight.bold),
+    );
   }
 
   Widget playButton() {
@@ -78,67 +74,77 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.only(top: 160),
-        child: Center(
-          child: Image.asset(
-            "assets/images/button-start.png",
-            width: 250,
-          ),
+      child: Center(
+        child: Image.asset(
+          "assets/images/button-start.png",
+          width: 200.h,
         ),
       ),
     );
   }
 
-  List<Offset> _calculatePositions(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+  List<Offset> _calculatePositions() {
     return _positions.map((relativeOffset) {
       return Offset(
-        screenSize.width * relativeOffset.dx,
-        screenSize.height * relativeOffset.dy,
+        1.sw * relativeOffset.dx,
+        1.sh * relativeOffset.dy,
       );
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final dynamicPositions = _calculatePositions(context);
+    final dynamicPositions = _calculatePositions();
 
     return Scaffold(
-        body: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF4A148C),
-            Color(0xFF311B92),
-            Color(0xFF1A237E),
-            Color(0xFF0D47A1),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF4A148C),
+              Color(0xFF311B92),
+              Color(0xFF1A237E),
+              Color(0xFF0D47A1),
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Image Stack
+            ...List.generate(images.length, (index) {
+              return Positioned(
+                top: dynamicPositions[index].dy,
+                left: dynamicPositions[index].dx,
+                child: AnimatedOpacity(
+                  duration: const Duration(seconds: 1),
+                  opacity: _visibilityStates[index] ? 1.0 : 0.0,
+                  child: SizedBox(
+                    width: 100.h,
+                    height: 100.h,
+                    child: Image.asset(
+                      images[index],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              );
+            }),
+
+            Positioned.fill(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  textTitle(),
+                  SizedBox(height: 30.h),
+                  playButton(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      child: Stack(
-        children: [
-          // Image Stack
-          ...List.generate(images.length, (index) {
-            return Positioned(
-              top: dynamicPositions[index].dy,
-              left: dynamicPositions[index].dx,
-              child: AnimatedOpacity(
-                duration: const Duration(seconds: 1),
-                opacity: _visibilityStates[index] ? 1.0 : 0.0,
-                child: Image.asset(
-                  images[index],
-                  fit: BoxFit.cover,
-                ),
-              ),
-            );
-          }),
-          textTitle(),
-          playButton()
-        ],
-      ),
-    ));
+    );
   }
 }
